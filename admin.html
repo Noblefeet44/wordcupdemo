@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Admin Dashboard — World Cup 2026 Tickets</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚙️</text></svg>" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body class="admin-body">
+
+    <!-- ───── PASSWORD GATE ───── -->
+    <div class="password-gate" id="password-gate">
+      <div class="password-gate-box">
+        <div style="font-size:3rem;margin-bottom:16px">🔐</div>
+        <h1>Admin Access</h1>
+        <p>Enter your admin password to manage World Cup 2026 ticket events and pricing.</p>
+        <div class="password-field">
+          <input type="password" id="pw-input" placeholder="Enter password…" autocomplete="current-password" />
+          <button class="btn btn-primary" id="pw-submit">Enter</button>
+        </div>
+        <div class="error-msg" id="pw-error"></div>
+      </div>
+    </div>
+
+    <!-- ───── ADMIN SHELL (hidden until authenticated) ───── -->
+    <div id="admin-shell" style="display:none">
+
+      <!-- Header -->
+      <header class="admin-header">
+        <div class="admin-header-brand">
+          <span>🏆</span>
+          <span>World Cup 2026 Tickets</span>
+          <span class="admin-badge">Admin</span>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <a href="/" target="_blank" class="btn btn-ghost btn-sm">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14 21 3"/></svg>
+            View Site
+          </a>
+          <button class="btn btn-ghost btn-sm" id="logout-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+            Logout
+          </button>
+        </div>
+      </header>
+
+      <main class="admin-main">
+
+        <!-- Alert area -->
+        <div id="admin-alert" style="display:none"></div>
+
+        <!-- Tabs -->
+        <div class="admin-tabs" role="tablist">
+          <button class="admin-tab active" role="tab" aria-selected="true" data-tab="events" id="tab-events">Events</button>
+          <button class="admin-tab" role="tab" aria-selected="false" data-tab="categories" id="tab-categories">Categories & Pricing</button>
+          <button class="admin-tab" role="tab" aria-selected="false" data-tab="setup" id="tab-setup">Supabase Setup</button>
+        </div>
+
+        <!-- ═══ TAB: EVENTS ═══ -->
+        <div class="admin-tab-panel active" id="panel-events" role="tabpanel" aria-labelledby="tab-events">
+
+          <!-- Add / Edit Event Form -->
+          <div class="admin-card">
+            <div class="admin-card-title">
+              <span id="event-form-title">➕ Add New Event</span>
+              <button class="btn btn-ghost btn-sm" id="reset-form-btn" style="display:none">✕ Cancel</button>
+            </div>
+
+            <input type="hidden" id="edit-event-id" />
+
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label" for="f-team1">Team 1</label>
+                <input class="form-input" id="f-team1" placeholder="e.g. Brazil" required />
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="f-team2">Team 2</label>
+                <input class="form-input" id="f-team2" placeholder="e.g. France" required />
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="f-match-type">Match Type / Group</label>
+                <input class="form-input" id="f-match-type" placeholder="e.g. World Cup - Group A" />
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="f-date">Match Date</label>
+                <input class="form-input" id="f-date" type="date" required />
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="f-time">Match Time (24h)</label>
+                <input class="form-input" id="f-time" type="time" required />
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="f-country">Country</label>
+                <select class="form-select" id="f-country">
+                  <option value="US">USA 🇺🇸</option>
+                  <option value="Canada">Canada 🇨🇦</option>
+                  <option value="Mexico">Mexico 🇲🇽</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="f-city">City</label>
+                <input class="form-input" id="f-city" placeholder="e.g. New York, NY" />
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="f-stadium">Stadium</label>
+                <input class="form-input" id="f-stadium" placeholder="e.g. MetLife Stadium" required />
+              </div>
+              <div class="form-group full">
+                <label class="form-label">Urgency Badges</label>
+                <div class="badge-checkboxes">
+                  <label class="badge-checkbox-label">
+                    <input type="checkbox" name="badge" value="hottest" />
+                    🔥 Hottest event
+                  </label>
+                  <label class="badge-checkbox-label">
+                    <input type="checkbox" name="badge" value="best_value" />
+                    💚 Best value
+                  </label>
+                  <label class="badge-checkbox-label">
+                    <input type="checkbox" name="badge" value="low_stock" />
+                    🚨 Only 2% of tickets left
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap;">
+              <button class="btn btn-primary" id="save-event-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/></svg>
+                Save Event
+              </button>
+            </div>
+          </div>
+
+          <!-- Events List -->
+          <div class="admin-card">
+            <div class="admin-card-title">
+              📋 All Events
+              <span id="event-count" class="text-muted" style="font-weight:400;font-size:0.85rem;"></span>
+            </div>
+            <div class="events-table-wrap">
+              <table class="events-table">
+                <thead>
+                  <tr>
+                    <th>Match</th>
+                    <th>Date</th>
+                    <th>Venue</th>
+                    <th>Badges</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="events-tbody">
+                  <tr><td colspan="6" style="text-align:center;color:var(--c-text-muted);padding:32px">Loading…</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ TAB: CATEGORIES ═══ -->
+        <div class="admin-tab-panel" id="panel-categories" role="tabpanel" aria-labelledby="tab-categories">
+          <div class="admin-card">
+            <div class="admin-card-title">🎟️ Ticket Categories & Pricing</div>
+
+            <div class="event-select-wrap">
+              <label for="cat-event-select">Select Event</label>
+              <select class="form-select" id="cat-event-select" style="max-width:460px">
+                <option value="">— Choose an event —</option>
+              </select>
+            </div>
+
+            <div id="cat-editor" style="display:none">
+              <div class="cat-grid" id="cat-grid">
+                <!-- Rows injected by JS -->
+              </div>
+              <div style="margin-top:20px">
+                <button class="btn btn-primary" id="save-cats-btn">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/></svg>
+                  Save Pricing
+                </button>
+              </div>
+            </div>
+
+            <div id="cat-placeholder" style="text-align:center;padding:40px;color:var(--c-text-muted)">
+              Select an event above to manage its ticket categories and pricing.
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ TAB: SUPABASE SETUP ═══ -->
+        <div class="admin-tab-panel" id="panel-setup" role="tabpanel" aria-labelledby="tab-setup">
+          <div class="admin-card">
+            <div class="admin-card-title">⚡ Supabase Setup Guide</div>
+            <p style="color:var(--c-text-muted);margin-bottom:24px;font-size:0.9rem;">
+              The app works with demo data by default. Follow these steps to connect your own Supabase database.
+            </p>
+
+            <div style="display:flex;flex-direction:column;gap:20px;">
+              <div style="padding:20px;background:var(--c-surface2);border-radius:var(--radius-md);border:1px solid var(--c-border)">
+                <h3 style="margin-bottom:8px;font-size:0.95rem;">1. Create a Supabase project</h3>
+                <p style="color:var(--c-text-muted);font-size:0.875rem;margin-bottom:12px">Go to <a href="https://supabase.com" target="_blank" style="color:var(--c-green)">supabase.com</a>, create a free account and a new project.</p>
+              </div>
+
+              <div style="padding:20px;background:var(--c-surface2);border-radius:var(--radius-md);border:1px solid var(--c-border)">
+                <h3 style="margin-bottom:8px;font-size:0.95rem;">2. Run this SQL in your Supabase SQL editor</h3>
+                <pre style="background:var(--c-bg);border:1px solid var(--c-border);border-radius:var(--radius-sm);padding:16px;font-size:0.78rem;overflow-x:auto;color:#90caf9;line-height:1.6"><code>-- Events table
+CREATE TABLE events (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  team1 TEXT NOT NULL,
+  team2 TEXT NOT NULL,
+  match_type TEXT,
+  match_date DATE,
+  match_time TIME,
+  country TEXT,
+  city TEXT,
+  stadium TEXT,
+  badges TEXT[],
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- Ticket categories table
+CREATE TABLE ticket_categories (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  event_id UUID REFERENCES events(id) ON DELETE CASCADE,
+  category_name TEXT,
+  price NUMERIC,
+  currency TEXT DEFAULT 'USD',
+  is_available BOOLEAN DEFAULT true
+);
+
+-- Enable Row Level Security (public read)
+ALTER TABLE events ENABLE ROW LEVEL SECURITY;
+ALTER TABLE ticket_categories ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Public read events" ON events FOR SELECT USING (true);
+CREATE POLICY "Public read categories" ON ticket_categories FOR SELECT USING (true);
+
+-- Service role full access (for admin)
+CREATE POLICY "Service role all events" ON events FOR ALL USING (auth.role() = 'service_role');
+CREATE POLICY "Service role all categories" ON ticket_categories FOR ALL USING (auth.role() = 'service_role');</code></pre>
+              </div>
+
+              <div style="padding:20px;background:var(--c-surface2);border-radius:var(--radius-md);border:1px solid var(--c-border)">
+                <h3 style="margin-bottom:8px;font-size:0.95rem;">3. Create a <code style="background:rgba(255,255,255,0.08);padding:2px 6px;border-radius:4px">.env</code> file in the project root</h3>
+                <pre style="background:var(--c-bg);border:1px solid var(--c-border);border-radius:var(--radius-sm);padding:16px;font-size:0.82rem;overflow-x:auto;color:#90caf9;line-height:1.6"><code>VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key-here</code></pre>
+                <p style="color:var(--c-text-muted);font-size:0.82rem;margin-top:10px">Find these in your Supabase project → Settings → API.</p>
+              </div>
+
+              <div style="padding:20px;background:var(--c-surface2);border-radius:var(--radius-md);border:1px solid var(--c-border)">
+                <h3 style="margin-bottom:8px;font-size:0.95rem;">4. Restart the dev server</h3>
+                <pre style="background:var(--c-bg);border:1px solid var(--c-border);border-radius:var(--radius-sm);padding:16px;font-size:0.82rem;color:#90caf9"><code>npm run dev</code></pre>
+                <p style="color:var(--c-text-muted);font-size:0.82rem;margin-top:10px">The demo banner will disappear and you can start adding real events from this dashboard.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </main>
+    </div><!-- /admin-shell -->
+
+    <script type="module" src="/src/admin.js"></script>
+  </body>
+</html>
