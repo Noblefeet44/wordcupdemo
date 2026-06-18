@@ -2,7 +2,7 @@ import './style.css'
 import { fetchEvents } from './supabase.js'
 
 // ─── Constants ────────────────────────────────────────────────────────────────
-const WA_NUMBER = '2347045636039'
+const WA_NUMBER = '447529460233'
 
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
 const DAYS   = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
