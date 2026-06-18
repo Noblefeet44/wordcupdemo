@@ -2,7 +2,11 @@
 // This file is completely standalone. It only READS form fields and fills them.
 // It does not modify any existing admin.js logic.
 
-const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || ''
+const GEMINI_API_KEY_RAW = import.meta.env.VITE_GEMINI_API_KEY || ''
+// Treat placeholder values as missing
+const GEMINI_API_KEY = (GEMINI_API_KEY_RAW && GEMINI_API_KEY_RAW !== 'your-gemini-api-key-here')
+  ? GEMINI_API_KEY_RAW
+  : ''
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`
 
 // ─── Inject HTML ───────────────────────────────────────────────────────────────
@@ -182,8 +186,9 @@ function injectAssistantUI() {
       </div>
 
       <div id="ai-no-key-warning">
-        ⚠️ <strong>VITE_GEMINI_API_KEY</strong> not set. Add it to your <code>.env</code> and Vercel env vars.
+        ⚠️ <strong>VITE_GEMINI_API_KEY</strong> not set in <code>.env</code>.
         <a href="https://aistudio.google.com/app/apikey" target="_blank">Get a free key →</a>
+        then restart the dev server.
       </div>
 
       <div id="ai-messages">

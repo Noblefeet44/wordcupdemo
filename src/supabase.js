@@ -4,11 +4,24 @@ import { createClient } from '@supabase/supabase-js'
 
 export const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || ''
 export const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || ''
+export const SUPABASE_SERVICE_KEY = import.meta.env.VITE_SUPABASE_SERVICE_KEY || ''
 
 // Only create client when real credentials are present (avoids error in demo mode)
 const isConfigured = SUPABASE_URL && SUPABASE_URL.startsWith('http')
+
+// Public client — used for read-only queries on the frontend
 export const supabase = isConfigured
   ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  : null
+
+// Admin client — uses service role key to bypass RLS for admin writes
+// Falls back to anon client if no service key is set (Supabase anon key must
+// have INSERT/UPDATE/DELETE policies enabled in that case)
+const adminKey = SUPABASE_SERVICE_KEY || SUPABASE_ANON_KEY
+export const supabaseAdmin = isConfigured
+  ? createClient(SUPABASE_URL, adminKey, {
+      auth: { persistSession: false, autoRefreshToken: false }
+    })
   : null
 
 // ─── DEMO DATA (used as fallback when Supabase is not yet configured) ─────────
@@ -159,30 +172,30 @@ export async function fetchAllEventsAdmin() {
 
 export async function createEvent(eventData) {
   if (!isConfigured) return { data: null, error: { message: 'Supabase not configured' } }
-  const { data, error } = await supabase.from('events').insert([eventData]).select()
+  const { data, error } = await supabaseAdmin.from('events').insert([eventData]).select()
   return { data, error }
 }
 
 export async function updateEvent(id, eventData) {
   if (!isConfigured) return { data: null, error: { message: 'Supabase not configured' } }
-  const { data, error } = await supabase.from('events').update(eventData).eq('id', id).select()
+  const { data, error } = await supabaseAdmin.from('events').update(eventData).eq('id', id).select()
   return { data, error }
 }
 
 export async function deleteEvent(id) {
   if (!isConfigured) return { error: { message: 'Supabase not configured' } }
-  const { error } = await supabase.from('events').delete().eq('id', id)
+  const { error } = await supabaseAdmin.from('events').delete().eq('id', id)
   return { error }
 }
 
 export async function upsertCategories(categories) {
   if (!isConfigured) return { data: null, error: { message: 'Supabase not configured' } }
-  const { data, error } = await supabase.from('ticket_categories').upsert(categories).select()
+  const { data, error } = await supabaseAdmin.from('ticket_categories').upsert(categories).select()
   return { data, error }
 }
 
 export async function deleteCategories(eventId) {
   if (!isConfigured) return { error: null }
-  const { error } = await supabase.from('ticket_categories').delete().eq('event_id', eventId)
+  const { error } = await supabaseAdmin.from('ticket_categories').delete().eq('event_id', eventId)
   return { error }
 }
